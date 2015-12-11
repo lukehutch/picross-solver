@@ -19,3 +19,5 @@ square separating them.
 ![Puzzle image](grid-shading-puzzle.jpg)
 
 The code is (C) 2015 Luke Hutchison; MIT-licensed.
+
+For a much more thorough look at picross / nonogram puzzles, see [Web Paint-by-Number](http://webpbn.com/), including the [survey of solvers](http://webpbn.com/survey/).
