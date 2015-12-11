@@ -1,5 +1,5 @@
 # picross-solver
-[Picross/Nonogram](https://en.wikipedia.org/wiki/Nonogram) puzzle solver, written for the [GCHQ Director's Christmas puzzle challenge 2015](http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx). Solves the puzzle in about 2 seconds.
+This is a solver for [Picross/Nonogram/Griddler puzzles](https://en.wikipedia.org/wiki/Nonogram), written for the [GCHQ Director's Christmas puzzle challenge 2015](http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx). This algorithm can solve the GCHQ puzzle in about 2 seconds.
 
 **Disclaimer / spoiler alert:** Don't run this code if you have any plans to try to solve this puzzle yourself.
 
