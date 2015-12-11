@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Picross puzzle solver
+ * Picross puzzle solver, written for GCHQ Director's Christmas puzzle challenge 2015:
  * 
- * Written for GCHQ Director's Christmas puzzle challenge 2015:
- * http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx
+ *     http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx
  * 
  * Solves the puzzle in about 2 seconds.
  * 
  * @author Luke Hutchison
+ * @url    https://github.com/lukehutch/picross-solver
  */
 public class PicrossSolver {
 
