@@ -350,8 +350,4 @@ public class PicrossSolver {
         recurse(currConstraints);
         System.out.println("No solution found -- took " + (System.currentTimeMillis() - startTime) + " msec");
     }
-
-    public static void main(String[] args) {
-        new PicrossSolver(GCHQProblem.GCHQProblem);
-    }
 }
