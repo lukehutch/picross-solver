@@ -1,4 +1,4 @@
-package main;
+package picross;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,50 +16,25 @@ import java.util.stream.Collectors;
  */
 public class PicrossSolver {
 
-    public static final String[] ROW_RUNS = { "73117", "112211", "13131131", "13116131", "13152131", "11211",
-            "7111117", "33", "123113112", "113211", "414212", "11111413", "211125", "322631", "191121", "212231",
-            "3111151", "1225", "7121113", "1121221", "131451", "1313a2", "131166", "112112", "72125", };
-
-    public static final String[] COL_RUNS = { "72117", "112211", "131313131", "13115131", "13114131", "111211",
-            "7111117", "113", "2121821", "22121112", "17321", "12311111", "41126", "3311131", "12522", "221111121",
-            "1332181", "621", "714113", "11114", "131371", "131112114", "131433", "1122261", "713211", };
-
-    public static final int[][] INITIAL_CONSTRAINTS = {
-            //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, +0, +0, -1, -1, -1, -1, -1, -1, -1, +0, +0, -1, -1, -1, -1, -1, -1, -1, +0, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, +0, +0, -1, -1, +0, -1, -1, -1, +0, +0, -1, -1, +0, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, +0, -1, -1, -1, -1, +0, -1, -1, -1, -1, +0, -1, -1, -1, +0, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, +0, +0, -1, -1, -1, -1, +0, +0, -1, -1, -1, -1, +0, -1, -1, -1, -1, +0, +0, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
-    };
-    private static final int NUM_COLS = 25, NUM_ROWS = 25;
-
-    static {
-        if (INITIAL_CONSTRAINTS.length != NUM_ROWS || INITIAL_CONSTRAINTS[0].length != NUM_COLS
-                || ROW_RUNS.length != NUM_ROWS || COL_RUNS.length != NUM_COLS) {
-            throw new RuntimeException("Wrong dimensions");
+    static class Problem {
+        // http://webpbn.com/XMLpuz.cgi?id=12548
+        public final int numRows, numCols;
+        public final String[] rowRuns, colRuns;
+        public final int[][] initialConstraints;
+        
+        public Problem(String[] rowRuns, String[] colRuns, int[][] initialConstraints) {
+            this.rowRuns = rowRuns;
+            this.colRuns = colRuns;
+            this.initialConstraints = initialConstraints;
+            this.numRows = rowRuns.length;
+            this.numCols = colRuns.length;
+            if (initialConstraints.length != numRows || initialConstraints[0].length != numCols) {
+                throw new RuntimeException("Wrong dimensions");
+            }
         }
     }
+    
+    Problem problem;
 
     private enum Status {
         NOT_FINISHED, FINISHED_VALID, FINISHED_INVALID, COMPLETED;
@@ -114,49 +89,49 @@ public class PicrossSolver {
         }
     }
 
-    private static Status runOneIter(int[][] currConstraints) {
+    private Status runOneIter(int[][] currConstraints) {
         ArrayList<ArrayList<ArrayList<Trace>>> hTraces = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<Trace>>> vTraces = new ArrayList<>();
-        for (int r = 0; r < NUM_ROWS + 1; r++) {
+        for (int r = 0; r < problem.numRows + 1; r++) {
             ArrayList<ArrayList<Trace>> hRow = new ArrayList<>();
             hTraces.add(hRow);
             ArrayList<ArrayList<Trace>> vRow = new ArrayList<>();
             vTraces.add(vRow);
-            for (int c = 0; c < NUM_COLS + 1; c++) {
+            for (int c = 0; c < problem.numCols + 1; c++) {
                 hRow.add(new ArrayList<>());
                 vRow.add(new ArrayList<>());
             }
         }
 
-        for (int r = 0; r < NUM_ROWS; r++) {
-            hTraces.get(r).get(0).add(new Trace(ROW_RUNS[r], ""));
+        for (int r = 0; r < problem.numRows; r++) {
+            hTraces.get(r).get(0).add(new Trace(problem.rowRuns[r], ""));
         }
-        for (int c = 0; c < NUM_COLS; c++) {
-            vTraces.get(0).get(c).add(new Trace(COL_RUNS[c], ""));
+        for (int c = 0; c < problem.numCols; c++) {
+            vTraces.get(0).get(c).add(new Trace(problem.colRuns[c], ""));
         }
 
-        for (int r = 0; r <= NUM_ROWS; r++) {
-            for (int c = 0; c < NUM_COLS; c++) {
-                boolean notDefinitelyBlack = r == NUM_ROWS || c == NUM_COLS || currConstraints[r][c] != 0;
+        for (int r = 0; r <= problem.numRows; r++) {
+            for (int c = 0; c < problem.numCols; c++) {
+                boolean notDefinitelyBlack = r == problem.numRows || c == problem.numCols || currConstraints[r][c] != 0;
                 if (notDefinitelyBlack) {
                     // If this might be white, or is white, all gaps can be extended to the right and down,
                     // as long as we haven't run out of possibilities in one of the two dimensions already.
                     ArrayList<Trace> hts = hTraces.get(r).get(c);
                     ArrayList<Trace> vts = vTraces.get(r).get(c);
-                    if (c < NUM_COLS) {
+                    if (c < problem.numCols) {
                         ArrayList<Trace> htsRight = hTraces.get(r).get(c + 1);
                         for (Trace ht : hts) {
                             htsRight.add(new Trace(ht, 1));
                         }
                     }
-                    if (r < NUM_ROWS) {
+                    if (r < problem.numRows) {
                         ArrayList<Trace> vtsDown = vTraces.get(r + 1).get(c);
                         for (Trace vt : vts) {
                             vtsDown.add(new Trace(vt, 1));
                         }
                     }
                 }
-                boolean notDefinitelyWhite = r < NUM_ROWS && c < NUM_COLS && currConstraints[r][c] != 1;
+                boolean notDefinitelyWhite = r < problem.numRows && c < problem.numCols && currConstraints[r][c] != 1;
                 if (notDefinitelyWhite) {
                     // If this can be black (or must be black), we can start a new run here, as long as
                     // the position immediately before or after the run is not definitely black.
@@ -165,10 +140,10 @@ public class PicrossSolver {
                         if (runLen > 0) {
                             int runEnd = c + runLen;
                             if ((c == 0 || currConstraints[r][c - 1] != 0)
-                                    && (runEnd == NUM_COLS || (runEnd < NUM_COLS && currConstraints[r][runEnd] != 0))) {
+                                    && (runEnd == problem.numCols || (runEnd < problem.numCols && currConstraints[r][runEnd] != 0))) {
                                 // Start a new run
                                 int storePos = ht.remainingRuns.length() > 1 ? runEnd + 1 : runEnd;
-                                if (storePos <= NUM_COLS) {
+                                if (storePos <= problem.numCols) {
                                     hTraces.get(r).get(storePos).add(new Trace(ht, 0));
                                 }
                             }
@@ -179,10 +154,10 @@ public class PicrossSolver {
                         if (runLen > 0) {
                             int runEnd = r + runLen;
                             if ((r == 0 || currConstraints[r - 1][c] != 0)
-                                    && (runEnd == NUM_ROWS || (runEnd < NUM_ROWS && currConstraints[runEnd][c] != 0))) {
+                                    && (runEnd == problem.numRows || (runEnd < problem.numRows && currConstraints[runEnd][c] != 0))) {
                                 // Start a new run
                                 int storePos = vt.remainingRuns.length() > 1 ? runEnd + 1 : runEnd;
-                                if (storePos <= NUM_ROWS) {
+                                if (storePos <= problem.numRows) {
                                     vTraces.get(storePos).get(c).add(new Trace(vt, 0));
                                 }
                             }
@@ -195,18 +170,18 @@ public class PicrossSolver {
         // and use these to resolve ambiguous colors  
         int numResolved = 0, numUnresolved = 0;
         int numValidRows = 0;
-        for (int r = 0; r < NUM_ROWS; r++) {
-            List<Trace> finishedTraces = hTraces.get(r).get(NUM_COLS).stream()
+        for (int r = 0; r < problem.numRows; r++) {
+            List<Trace> finishedTraces = hTraces.get(r).get(problem.numCols).stream()
                     .filter(t -> t.remainingRuns.isEmpty()).collect(Collectors.toList());
             if (!finishedTraces.isEmpty()) {
                 numValidRows++;
             } else {
                 System.out.println("Empty row: " + r);
             }
-            int[] numWhite = new int[NUM_COLS], numBlack = new int[NUM_COLS];
+            int[] numWhite = new int[problem.numCols], numBlack = new int[problem.numCols];
             for (Trace t : finishedTraces) {
                 if (t.remainingRuns.isEmpty()) {
-                    for (int c = 0; c < NUM_COLS; c++) {
+                    for (int c = 0; c < problem.numCols; c++) {
                         char color = t.path.charAt(c);
                         if (color == '0') {
                             numBlack[c]++;
@@ -216,7 +191,7 @@ public class PicrossSolver {
                     }
                 }
             }
-            for (int c = 0; c < NUM_COLS; c++) {
+            for (int c = 0; c < problem.numCols; c++) {
                 if (numBlack[c] == 0 && numWhite[c] > 0) {
                     if (currConstraints[r][c] == -1) {
                         numResolved++;
@@ -239,18 +214,18 @@ public class PicrossSolver {
             }
         }
         int numValidColumns = 0;
-        for (int c = 0; c < NUM_COLS; c++) {
-            List<Trace> finishedTraces = vTraces.get(NUM_ROWS).get(c).stream()
+        for (int c = 0; c < problem.numCols; c++) {
+            List<Trace> finishedTraces = vTraces.get(problem.numRows).get(c).stream()
                     .filter(t -> t.remainingRuns.isEmpty()).collect(Collectors.toList());
             if (!finishedTraces.isEmpty()) {
                 numValidColumns++;
             } else {
                 System.out.println("Empty column: " + c);
             }
-            int[] numWhite = new int[NUM_ROWS], numBlack = new int[NUM_ROWS];
+            int[] numWhite = new int[problem.numRows], numBlack = new int[problem.numRows];
             for (Trace t : finishedTraces) {
                 if (t.remainingRuns.isEmpty()) {
-                    for (int r = 0; r < NUM_ROWS; r++) {
+                    for (int r = 0; r < problem.numRows; r++) {
                         char color = t.path.charAt(r);
                         if (color == '0') {
                             numBlack[r]++;
@@ -260,7 +235,7 @@ public class PicrossSolver {
                     }
                 }
             }
-            for (int r = 0; r < NUM_ROWS; r++) {
+            for (int r = 0; r < problem.numRows; r++) {
                 if (numBlack[r] == 0 && numWhite[r] > 0) {
                     if (currConstraints[r][c] == -1) {
                         numResolved++;
@@ -286,8 +261,8 @@ public class PicrossSolver {
             }
         }
         // Print current state of board
-        for (int r = 0; r < NUM_ROWS; r++) {
-            for (int c = 0; c < NUM_COLS; c++) {
+        for (int r = 0; r < problem.numRows; r++) {
+            for (int c = 0; c < problem.numCols; c++) {
                 int constraint = currConstraints[r][c];
                 char color = constraint == -1 ? '?' : constraint == 0 ? '#' : ' ';
                 System.out.print(color);
@@ -298,11 +273,11 @@ public class PicrossSolver {
                 + numValidColumns + "; num valid rows: " + numValidRows);
 
         return numResolved > 0 ? Status.NOT_FINISHED
-                : numValidRows == NUM_ROWS && numValidColumns == NUM_COLS ? (numUnresolved == 0 ? Status.COMPLETED
+                : numValidRows == problem.numRows && numValidColumns == problem.numCols ? (numUnresolved == 0 ? Status.COMPLETED
                         : Status.FINISHED_VALID) : Status.FINISHED_INVALID;
     }
 
-    private static Status runAllIters(int[][] currConstraints) {
+    private Status runAllIters(int[][] currConstraints) {
         Status status = Status.NOT_FINISHED;
         for (int iter = 0; status == Status.NOT_FINISHED; iter++) {
             System.out.println("\nIter: " + iter);
@@ -321,9 +296,9 @@ public class PicrossSolver {
         return arrCopy;
     }
 
-    private static void recurse(int[][] currConstraints) {
-        for (int r = 0; r < NUM_ROWS; r++) {
-            for (int c = 0; c < NUM_COLS; c++) {
+    private void recurse(int[][] currConstraints) {
+        for (int r = 0; r < problem.numRows; r++) {
+            for (int c = 0; c < problem.numCols; c++) {
                 // For all remaining ambiguous entries 
                 if (currConstraints[r][c] == -1) {
                     // Try substituting black for the ambiguous entry					
@@ -362,14 +337,20 @@ public class PicrossSolver {
         }
     }
 
-    public static void main(String[] args) {
+    public PicrossSolver(Problem problem) {
+        this.problem = problem;
+        
         // Iterate until no more constraints can be resolved
-        int[][] currConstraints = dup(INITIAL_CONSTRAINTS);
+        int[][] currConstraints = dup(problem.initialConstraints);
         Status initialStatus = runAllIters(currConstraints);
         if (initialStatus != Status.FINISHED_VALID) {
             throw new RuntimeException("Failed");
         }
         recurse(currConstraints);
         System.out.println("No solution found -- took " + (System.currentTimeMillis() - startTime) + " msec");
+    }
+    
+    public static void main(String[] args) {
+        new PicrossSolver(GCHQProblem.GCHQProblem);
     }
 }
