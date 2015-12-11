@@ -1,27 +1,33 @@
 package picross;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * Picross puzzle solver, written for GCHQ Director's Christmas puzzle challenge 2015:
  * 
- *     http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx
+ * http://www.gchq.gov.uk/press_and_media/news_and_features/Pages/Directors-Christmas-puzzle-2015.aspx
  * 
  * Solves the puzzle in about 2 seconds.
  * 
  * @author Luke Hutchison
- * @url    https://github.com/lukehutch/picross-solver
+ * @url https://github.com/lukehutch/picross-solver
  */
 public class PicrossSolver {
 
     static class Problem {
-        // http://webpbn.com/XMLpuz.cgi?id=12548
         public final int numRows, numCols;
         public final String[] rowRuns, colRuns;
         public final int[][] initialConstraints;
-        
+
         public Problem(String[] rowRuns, String[] colRuns, int[][] initialConstraints) {
             this.rowRuns = rowRuns;
             this.colRuns = colRuns;
@@ -32,8 +38,60 @@ public class PicrossSolver {
                 throw new RuntimeException("Wrong dimensions");
             }
         }
+
+        // Solve a problem on http://webpbn.com/
+        public Problem(int webpbnProbNum) {
+            try {
+                Pattern countMatcher = Pattern.compile("<count>([0-9]+)</count>");
+                StringBuffer result = new StringBuffer();
+                URL url = new URL("http://webpbn.com/XMLpuz.cgi?id=" + webpbnProbNum);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                ArrayList<String> rowRuns = new ArrayList<>(), colRuns = new ArrayList<>();
+                boolean colLines = false;
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                    for (String line; (line = rd.readLine()) != null;) {
+                        if (line.equals("<clues type=\"columns\">")) {
+                            colLines = true;
+                        } else if (line.equalsIgnoreCase("<clues type=\"rows\">")) {
+                            colLines = false;
+                        } else if (line.startsWith("<line>")) {
+                            StringBuilder run = new StringBuilder();
+                            Matcher matcher = countMatcher.matcher(line);
+                            while (matcher.find()) {
+                                int num = Integer.parseInt(matcher.group(1));
+                                if (num <= 0) {
+                                    throw new RuntimeException("Run length is zero or negative");
+                                }
+                                // TODO: Should probably encode these using ints, rather than chars
+                                if (num < 10) {
+                                    run.append("" + num);
+                                } else {
+                                    char chr = (char) ('A' + num - 10);
+                                    // if (chr > 126) {
+                                    //     throw new RuntimeException("Run length too big");
+                                    // }
+                                    run.append(chr);
+                                }
+                            }
+                        }
+                        result.append(line);
+                    }
+                }
+                // TODO
+                this.numRows = this.numCols = 0;
+                this.rowRuns = this.colRuns = null;
+                this.initialConstraints = null;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-    
+
+    static {
+        new Problem(12548);
+    }
+
     Problem problem;
 
     private enum Status {
@@ -79,7 +137,7 @@ public class PicrossSolver {
             if (c >= '0' && c <= '9') {
                 return (int) (c - '0');
             } else {
-                return (int) (c - 'a') + 10;
+                return (int) (c - 'A') + 10;
             }
         }
 
@@ -112,7 +170,8 @@ public class PicrossSolver {
 
         for (int r = 0; r <= problem.numRows; r++) {
             for (int c = 0; c < problem.numCols; c++) {
-                boolean notDefinitelyBlack = r == problem.numRows || c == problem.numCols || currConstraints[r][c] != 0;
+                boolean notDefinitelyBlack = r == problem.numRows || c == problem.numCols
+                        || currConstraints[r][c] != 0;
                 if (notDefinitelyBlack) {
                     // If this might be white, or is white, all gaps can be extended to the right and down,
                     // as long as we haven't run out of possibilities in one of the two dimensions already.
@@ -131,7 +190,8 @@ public class PicrossSolver {
                         }
                     }
                 }
-                boolean notDefinitelyWhite = r < problem.numRows && c < problem.numCols && currConstraints[r][c] != 1;
+                boolean notDefinitelyWhite = r < problem.numRows && c < problem.numCols
+                        && currConstraints[r][c] != 1;
                 if (notDefinitelyWhite) {
                     // If this can be black (or must be black), we can start a new run here, as long as
                     // the position immediately before or after the run is not definitely black.
@@ -272,9 +332,9 @@ public class PicrossSolver {
         System.out.println(numResolved + " resolved; " + numUnresolved + " unresolved; num valid columns: "
                 + numValidColumns + "; num valid rows: " + numValidRows);
 
-        return numResolved > 0 ? Status.NOT_FINISHED
-                : numValidRows == problem.numRows && numValidColumns == problem.numCols ? (numUnresolved == 0 ? Status.COMPLETED
-                        : Status.FINISHED_VALID) : Status.FINISHED_INVALID;
+        return numResolved > 0 ? Status.NOT_FINISHED : numValidRows == problem.numRows
+                && numValidColumns == problem.numCols ? (numUnresolved == 0 ? Status.COMPLETED
+                : Status.FINISHED_VALID) : Status.FINISHED_INVALID;
     }
 
     private Status runAllIters(int[][] currConstraints) {
@@ -339,7 +399,7 @@ public class PicrossSolver {
 
     public PicrossSolver(Problem problem) {
         this.problem = problem;
-        
+
         // Iterate until no more constraints can be resolved
         int[][] currConstraints = dup(problem.initialConstraints);
         Status initialStatus = runAllIters(currConstraints);
@@ -349,7 +409,7 @@ public class PicrossSolver {
         recurse(currConstraints);
         System.out.println("No solution found -- took " + (System.currentTimeMillis() - startTime) + " msec");
     }
-    
+
     public static void main(String[] args) {
         new PicrossSolver(GCHQProblem.GCHQProblem);
     }
