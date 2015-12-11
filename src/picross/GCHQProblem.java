@@ -4,7 +4,7 @@ import picross.PicrossSolver.Problem;
 
 public class GCHQProblem {
     
-    public static final Problem GCHQProblem = new Problem(
+    public static final Problem GCHQ_PROBLEM = new Problem(
             //
             new String[] { "73117", "112211", "13131131", "13116131", "13152131", "11211",
             "7111117", "33", "123113112", "113211", "414212", "11111413", "211125", "322631", "191121", "212231",
@@ -41,5 +41,9 @@ public class GCHQProblem {
             { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
             { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, //
             });
+
+    public static void main(String[] args) {
+        new PicrossSolver(GCHQ_PROBLEM);
+    }
 
 }
