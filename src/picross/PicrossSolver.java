@@ -290,7 +290,7 @@ public class PicrossSolver {
     private static int[][] dup(int[][] arr) {
         int[][] arrCopy = new int[arr.length][arr[0].length];
         for (int r = 0; r < arr.length; r++) {
-            for (int c = 0; c < arr.length; c++) {
+            for (int c = 0; c < arr[0].length; c++) {
                 arrCopy[r][c] = arr[r][c];
             }
         }
